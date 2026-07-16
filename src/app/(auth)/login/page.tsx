@@ -101,7 +101,7 @@ export default function LoginPage() {
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
 
-            <Button disabled={isLoading} className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white">
+            <Button type="submit" disabled={isLoading} className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white">
               {isLoading ? "Signing in..." : (
                 <>Sign In <ArrowRight className="ml-2 w-4 h-4" /></>
               )}

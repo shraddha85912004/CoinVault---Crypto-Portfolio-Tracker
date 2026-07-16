@@ -118,7 +118,7 @@ export default function RegisterPage() {
               {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
             </div>
 
-            <Button disabled={isLoading} className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white">
+            <Button type="submit" disabled={isLoading} className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white">
               {isLoading ? "Creating account..." : (
                 <>Sign Up <ArrowRight className="ml-2 w-4 h-4" /></>
               )}
