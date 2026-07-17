@@ -1,8 +1,15 @@
 import { MarketOverview } from "@/components/dashboard/market-overview";
 import { PortfolioList } from "@/components/dashboard/portfolio-list";
 import { Suspense } from "react";
+import { getPortfolio } from "@/app/actions/portfolio";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const transactions = await getPortfolio();
+  
+  // Calculate total balance from transactions
+  // In a real app we would multiply by live price, for now just sum the amounts spent/held
+  const totalBalance = transactions.reduce((acc, tx) => acc + (tx.amount * tx.averagePrice), 0);
+  
   return (
     <div className="space-y-6">
       <div>
@@ -13,8 +20,10 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Placeholder cards */}
         <div className="rounded-xl border border-white/10 bg-[#18181B] p-6">
-          <h3 className="text-sm font-medium text-gray-400">Total Balance</h3>
-          <p className="text-3xl font-bold text-white mt-2">$0.00</p>
+          <h3 className="text-sm font-medium text-gray-400">Total Balance (Est)</h3>
+          <p className="text-3xl font-bold text-white mt-2">
+            ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
         </div>
         <div className="rounded-xl border border-white/10 bg-[#18181B] p-6">
           <h3 className="text-sm font-medium text-gray-400">24h Change</h3>
@@ -22,7 +31,9 @@ export default function DashboardPage() {
         </div>
         <div className="rounded-xl border border-white/10 bg-[#18181B] p-6">
           <h3 className="text-sm font-medium text-gray-400">Active Assets</h3>
-          <p className="text-3xl font-bold text-white mt-2">0</p>
+          <p className="text-3xl font-bold text-white mt-2">
+            {new Set(transactions.map(t => t.symbol)).size}
+          </p>
         </div>
       </div>
       
@@ -37,7 +48,7 @@ export default function DashboardPage() {
           </Suspense>
         </div>
         <div className="md:col-span-3">
-          <PortfolioList />
+          <PortfolioList initialTransactions={transactions} />
         </div>
       </div>
     </div>
