@@ -1,4 +1,5 @@
 import { MarketOverview } from "@/components/dashboard/market-overview";
+import { PortfolioList } from "@/components/dashboard/portfolio-list";
 import { Suspense } from "react";
 
 export default function DashboardPage() {
@@ -35,11 +36,8 @@ export default function DashboardPage() {
             <MarketOverview />
           </Suspense>
         </div>
-        <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 md:col-span-3">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Transactions</h3>
-          <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-lg">
-            <span className="text-gray-500">No recent transactions</span>
-          </div>
+        <div className="md:col-span-3">
+          <PortfolioList />
         </div>
       </div>
     </div>
