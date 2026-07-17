@@ -4,6 +4,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { addTransaction } from "@/app/actions/portfolio";
+import { toast } from "sonner"; // Assuming sonner is or will be installed
+
+const transactionSchema = z.object({
+  symbol: z.string().min(1, "Symbol is required").toUpperCase(),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  pricePerCoin: z.coerce.number().positive("Price must be positive"),
+});
+
+type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -12,15 +25,36 @@ interface AddTransactionModalProps {
 
 export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<TransactionFormValues>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      symbol: "",
+      amount: 0,
+      pricePerCoin: 0,
+    }
+  });
+
+  const onSubmit = async (data: TransactionFormValues) => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    setError("");
+    try {
+      await addTransaction({
+        coinId: data.symbol.toLowerCase(),
+        name: data.symbol.toUpperCase(),
+        symbol: data.symbol.toUpperCase(),
+        type: "BUY",
+        amount: data.amount,
+        pricePerCoin: data.pricePerCoin,
+      });
+      reset();
       onClose();
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || "Failed to add transaction");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,36 +67,41 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+          {error && <div className="text-sm text-red-500 bg-red-500/10 p-2 rounded">{error}</div>}
+          
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">Coin Symbol</label>
             <Input 
+              {...register("symbol")}
               placeholder="e.g. BTC, ETH" 
               className="bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
-              required
             />
+            {errors.symbol && <p className="text-sm text-red-500">{errors.symbol.message}</p>}
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Amount</label>
               <Input 
+                {...register("amount")}
                 type="number" 
                 step="any"
                 placeholder="0.00" 
                 className="bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
-                required
               />
+              {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Price per coin ($)</label>
               <Input 
+                {...register("pricePerCoin")}
                 type="number" 
                 step="any"
                 placeholder="0.00" 
                 className="bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
-                required
               />
+              {errors.pricePerCoin && <p className="text-sm text-red-500">{errors.pricePerCoin.message}</p>}
             </div>
           </div>
 
