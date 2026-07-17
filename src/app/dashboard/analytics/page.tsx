@@ -1,5 +1,6 @@
 import { getPortfolio } from "@/app/actions/portfolio";
 import { PortfolioCharts } from "@/components/dashboard/portfolio-charts";
+import Link from "next/link";
 
 export default async function AnalyticsPage() {
   const transactions = await getPortfolio();
@@ -33,9 +34,14 @@ export default async function AnalyticsPage() {
       </div>
       
       {chartData.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-[#18181B] p-12 text-center">
+        <div className="rounded-xl border border-white/10 bg-[#18181B] p-12 text-center flex flex-col items-center">
           <h3 className="text-xl font-semibold text-white mb-2">No data available</h3>
-          <p className="text-gray-400">Add some transactions to your portfolio to see your analytics.</p>
+          <p className="text-gray-400 mb-6 max-w-md mx-auto">
+            You don't have any assets in your portfolio yet. Add some transactions to unlock powerful analytics and distribution charts.
+          </p>
+          <Link href="/dashboard" className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-2 rounded-md font-medium transition-colors">
+            Go to Dashboard
+          </Link>
         </div>
       ) : (
         <PortfolioCharts data={chartData} />
