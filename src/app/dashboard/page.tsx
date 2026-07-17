@@ -17,7 +17,7 @@ export default async function DashboardPage() {
         <p className="text-gray-400 mt-1">Welcome back! Here's an overview of your crypto portfolio.</p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {/* Placeholder cards */}
         <div className="rounded-xl border border-white/10 bg-[#18181B] p-6">
           <h3 className="text-sm font-medium text-gray-400">Total Balance (Est)</h3>
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
           <h3 className="text-sm font-medium text-gray-400">24h Change</h3>
           <p className="text-3xl font-bold text-white mt-2">0.00%</p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-[#18181B] p-6">
+        <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 sm:col-span-2 lg:col-span-1">
           <h3 className="text-sm font-medium text-gray-400">Active Assets</h3>
           <p className="text-3xl font-bold text-white mt-2">
             {new Set(transactions.map(t => t.symbol)).size}
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
         </div>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
         <div className="md:col-span-4">
           <Suspense fallback={
             <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 h-[400px] flex items-center justify-center">
