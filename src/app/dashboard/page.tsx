@@ -1,3 +1,6 @@
+import { MarketOverview } from "@/components/dashboard/market-overview";
+import { Suspense } from "react";
+
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -23,11 +26,14 @@ export default function DashboardPage() {
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 md:col-span-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Market Overview</h3>
-          <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-lg">
-            <span className="text-gray-500">Live prices loading...</span>
-          </div>
+        <div className="md:col-span-4">
+          <Suspense fallback={
+            <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 h-[400px] flex items-center justify-center">
+              <span className="text-gray-500 animate-pulse">Loading live market data...</span>
+            </div>
+          }>
+            <MarketOverview />
+          </Suspense>
         </div>
         <div className="rounded-xl border border-white/10 bg-[#18181B] p-6 md:col-span-3">
           <h3 className="text-lg font-semibold text-white mb-4">Recent Transactions</h3>
