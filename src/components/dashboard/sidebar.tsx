@@ -3,7 +3,7 @@ import { LayoutDashboard, Wallet, LineChart, Settings, LogOut } from "lucide-rea
 
 export function Sidebar() {
   return (
-    <div className="flex h-screen w-64 flex-col border-r border-white/10 bg-[#09090B] px-4 py-6">
+    <div className="hidden md:flex h-screen w-64 flex-col border-r border-white/10 bg-[#09090B] px-4 py-6">
       <Link href="/dashboard" className="flex items-center gap-2 mb-10 px-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7C3AED] font-bold text-white shadow-[0_0_15px_rgba(124,58,237,0.5)]">
           C

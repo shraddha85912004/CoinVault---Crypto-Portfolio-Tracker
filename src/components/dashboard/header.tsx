@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut, Settings } from "lucide-react";
+import { Bell, Search, User, LogOut, Settings, Menu, LayoutDashboard, Wallet, LineChart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,13 +9,51 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import Link from "next/link";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export function Header() {
   return (
-    <header className="flex h-16 items-center justify-between border-b border-white/10 bg-[#09090B]/50 px-6 backdrop-blur-md">
+    <header className="flex h-16 items-center justify-between border-b border-white/10 bg-[#09090B]/50 px-4 md:px-6 backdrop-blur-md">
       <div className="flex items-center gap-4 w-full max-w-md">
-        <div className="relative w-full">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:text-white">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 bg-[#09090B] border-r border-white/10 p-0 text-white">
+            <VisuallyHidden>
+              <SheetTitle>Mobile Navigation</SheetTitle>
+              <SheetDescription>Navigation menu for mobile devices</SheetDescription>
+            </VisuallyHidden>
+            <div className="flex h-screen flex-col px-4 py-6">
+              <Link href="/dashboard" className="flex items-center gap-2 mb-10 px-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7C3AED] font-bold text-white shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+                  C
+                </div>
+                <span className="text-xl font-bold text-white tracking-tight">CoinVault</span>
+              </Link>
+              <nav className="flex flex-1 flex-col gap-2">
+                <Link href="/dashboard" className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
+                  <LayoutDashboard className="h-4 w-4 text-[#7C3AED]" />
+                  Dashboard
+                </Link>
+                <Link href="/dashboard/portfolio" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
+                  <Wallet className="h-4 w-4" />
+                  Portfolio
+                </Link>
+                <Link href="/dashboard/analytics" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
+                  <LineChart className="h-4 w-4" />
+                  Analytics
+                </Link>
+              </nav>
+            </div>
+          </SheetContent>
+        </Sheet>
+        
+        <div className="relative w-full hidden sm:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
           <Input 
             type="search" 
