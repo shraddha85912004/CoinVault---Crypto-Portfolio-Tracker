@@ -38,3 +38,54 @@ export async function addTransaction(data: {
     throw new Error(error.message || "Failed to add transaction");
   }
 }
+
+export async function getPortfolio() {
+  const session = await getSession();
+  if (!session || !session.userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const userId = session.userId as string;
+
+  try {
+    const portfolio = await prisma.portfolio.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+    
+    return portfolio;
+  } catch (error: any) {
+    console.error("Failed to fetch portfolio:", error);
+    return [];
+  }
+}
+
+export async function deleteTransaction(id: string) {
+  const session = await getSession();
+  if (!session || !session.userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const userId = session.userId as string;
+
+  try {
+    // Ensure the transaction belongs to the user before deleting
+    const transaction = await prisma.portfolio.findUnique({
+      where: { id },
+    });
+
+    if (!transaction || transaction.userId !== userId) {
+      throw new Error("Transaction not found or unauthorized");
+    }
+
+    await prisma.portfolio.delete({
+      where: { id },
+    });
+
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Failed to delete transaction:", error);
+    throw new Error(error.message || "Failed to delete transaction");
+  }
+}
