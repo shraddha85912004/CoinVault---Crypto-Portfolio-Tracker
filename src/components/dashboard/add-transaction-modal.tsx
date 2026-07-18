@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,20 +21,27 @@ type TransactionFormValues = z.infer<typeof transactionSchema>;
 interface AddTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialSymbol?: string;
 }
 
-export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProps) {
+export function AddTransactionModal({ isOpen, onClose, initialSymbol = "" }: AddTransactionModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<TransactionFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      symbol: "",
+      symbol: initialSymbol,
       amount: 0,
       pricePerCoin: 0,
     }
   });
+
+  useEffect(() => {
+    if (initialSymbol) {
+      setValue("symbol", initialSymbol);
+    }
+  }, [initialSymbol, setValue]);
 
   const onSubmit = async (data: TransactionFormValues) => {
     setIsLoading(true);
