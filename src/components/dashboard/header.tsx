@@ -196,11 +196,12 @@ export function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <AddTransactionModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        initialSymbol={selectedCoinSymbol}
-      />
-    </>
+    </header>
+    <AddTransactionModal 
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      initialSymbol={selectedCoinSymbol}
+    />
+  </>
   );
 }
