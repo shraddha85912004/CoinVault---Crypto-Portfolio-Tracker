@@ -75,7 +75,7 @@ export function AddTransactionModal({ isOpen, onClose, initialSymbol = "" }: Add
         </DialogHeader>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          {error && <div className="text-sm text-red-500 bg-red-500/10 p-2 rounded">{error}</div>}
+          {error && <div className="text-sm text-red-500 bg-red-500/10 p-2 rounded break-words max-h-32 overflow-y-auto">{error}</div>}
           
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">Coin Symbol</label>

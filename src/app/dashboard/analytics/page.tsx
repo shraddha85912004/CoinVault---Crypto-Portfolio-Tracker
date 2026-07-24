@@ -1,9 +1,9 @@
-import { getPortfolio } from "@/app/actions/portfolio";
+import { getPortfolioWithLiveMetrics } from "@/app/actions/portfolio";
 import { PortfolioCharts } from "@/components/dashboard/portfolio-charts";
 import Link from "next/link";
 
 export default async function AnalyticsPage() {
-  const transactions = await getPortfolio();
+  const transactions = await getPortfolioWithLiveMetrics();
   
   // Aggregate portfolio data
   const holdings: Record<string, { symbol: string; name: string; amount: number; totalValue: number }> = {};
@@ -21,7 +21,7 @@ export default async function AnalyticsPage() {
     // In a real app with sell functionality, we'd subtract sells.
     // For now we assume they are all holdings.
     holdings[tx.symbol].amount += tx.amount;
-    holdings[tx.symbol].totalValue += (tx.amount * tx.averagePrice);
+    holdings[tx.symbol].totalValue += tx.currentValue;
   });
 
   const chartData = Object.values(holdings).sort((a, b) => b.totalValue - a.totalValue);

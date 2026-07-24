@@ -72,10 +72,8 @@ export function Header() {
       <header className="flex h-16 items-center justify-between border-b border-white/10 bg-[#09090B]/50 px-4 md:px-6 backdrop-blur-md">
         <div className="flex items-center gap-4 w-full max-w-md">
           <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:text-white">
-                <Menu className="h-5 w-5" />
-              </Button>
+            <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:text-white" />}>
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="left" className="w-64 bg-[#09090B] border-r border-white/10 p-0 text-white">
               <VisuallyHidden>
@@ -168,30 +166,24 @@ export function Header() {
         </Button>
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="h-8 w-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#3B82F6] p-[2px] outline-none">
-              <div className="h-full w-full rounded-full bg-[#18181B] flex items-center justify-center hover:bg-[#27272A] transition-colors">
-                <User className="h-4 w-4 text-white" />
-              </div>
-            </button>
+          <DropdownMenuTrigger render={<button className="h-8 w-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#3B82F6] p-[2px] outline-none" />}>
+            <div className="h-full w-full rounded-full bg-[#18181B] flex items-center justify-center hover:bg-[#27272A] transition-colors">
+              <User className="h-4 w-4 text-white" />
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-[#18181B] border-white/10 text-white">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer">
-              <Link href="/dashboard/settings" className="flex items-center w-full">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </Link>
+            <DropdownMenuItem className="hover:bg-white/10 cursor-pointer" render={<Link href="/dashboard/settings" className="flex items-center w-full" />}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem asChild className="hover:bg-red-500/10 text-red-500 cursor-pointer focus:bg-red-500/10 focus:text-red-500">
-              <form action="/api/auth/logout" method="POST" className="w-full">
-                <button type="submit" className="flex items-center w-full">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </button>
-              </form>
+            <DropdownMenuItem className="hover:bg-red-500/10 text-red-500 cursor-pointer focus:bg-red-500/10 focus:text-red-500" render={<form action="/api/auth/logout" method="POST" className="w-full" />}>
+              <button type="submit" className="flex items-center w-full">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

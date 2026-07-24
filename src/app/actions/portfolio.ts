@@ -27,7 +27,7 @@ export async function addTransaction(data: {
         symbol: data.symbol,
         name: data.name,
         amount: data.amount,
-        averagePrice: data.pricePerCoin,
+        buyPrice: data.pricePerCoin,
       },
     });
 
@@ -88,4 +88,49 @@ export async function deleteTransaction(id: string) {
     console.error("Failed to delete transaction:", error);
     throw new Error(error.message || "Failed to delete transaction");
   }
+}
+
+import { getLivePrices } from "@/lib/coingecko";
+
+export type PortfolioWithMetrics = {
+  id: string;
+  coinId: string;
+  symbol: string;
+  name: string;
+  amount: number;
+  buyPrice: number;
+  createdAt: Date;
+  currentPrice: number;
+  currentValue: number;
+  profitAmount: number;
+  profitPercentage: number;
+  change24h: number;
+};
+
+export async function getPortfolioWithLiveMetrics(): Promise<PortfolioWithMetrics[]> {
+  const transactions = await getPortfolio();
+  if (transactions.length === 0) return [];
+
+  const coinIds = transactions.map(t => t.coinId);
+  const livePrices = await getLivePrices(coinIds);
+
+  return transactions.map(tx => {
+    const liveData = livePrices[tx.coinId] || { usd: tx.buyPrice, usd_24h_change: 0 };
+    const currentPrice = liveData.usd;
+    const change24h = liveData.usd_24h_change || 0;
+    
+    const currentValue = tx.amount * currentPrice;
+    const totalInvested = tx.amount * tx.buyPrice;
+    const profitAmount = currentValue - totalInvested;
+    const profitPercentage = totalInvested > 0 ? (profitAmount / totalInvested) * 100 : 0;
+
+    return {
+      ...tx,
+      currentPrice,
+      currentValue,
+      profitAmount,
+      profitPercentage,
+      change24h
+    };
+  });
 }
