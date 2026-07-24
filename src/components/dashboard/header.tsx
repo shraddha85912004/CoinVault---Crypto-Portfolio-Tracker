@@ -19,7 +19,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { searchCoins } from "@/lib/coingecko";
 import { AddTransactionModal } from "./add-transaction-modal";
 
-export function Header() {
+export function Header({ userName = "My Account" }: { userName?: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -69,7 +69,7 @@ export function Header() {
 
   return (
     <>
-      <header className="flex h-16 items-center justify-between border-b border-white/10 bg-[#09090B]/50 px-4 md:px-6 backdrop-blur-md">
+      <header className="relative z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#09090B]/50 px-4 md:px-6 backdrop-blur-md">
         <div className="flex items-center gap-4 w-full max-w-md">
           <Sheet>
             <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-gray-400 hover:text-white" />}>
@@ -172,15 +172,15 @@ export function Header() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-[#18181B] border-white/10 text-white">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <div className="px-2 py-1.5 text-sm font-semibold">{userName}</div>
             <DropdownMenuSeparator className="bg-white/10" />
             <DropdownMenuItem className="hover:bg-white/10 cursor-pointer" render={<Link href="/dashboard/settings" className="flex items-center w-full" />}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem className="hover:bg-red-500/10 text-red-500 cursor-pointer focus:bg-red-500/10 focus:text-red-500" render={<form action="/api/auth/logout" method="POST" className="w-full" />}>
-              <button type="submit" className="flex items-center w-full">
+            <DropdownMenuItem variant="destructive" className="cursor-pointer" render={<form action="/api/auth/logout" method="POST" className="w-full" />}>
+              <button type="submit" className="flex items-center w-full bg-transparent border-none shadow-none outline-none text-red-500 hover:text-red-400">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </button>

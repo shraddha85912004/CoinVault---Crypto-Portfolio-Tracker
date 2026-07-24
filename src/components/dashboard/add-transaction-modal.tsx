@@ -3,7 +3,10 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { searchCoins } from "@/lib/coingecko";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -28,7 +31,7 @@ export function AddTransactionModal({ isOpen, onClose, initialSymbol = "" }: Add
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<TransactionFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       symbol: initialSymbol,
@@ -36,6 +39,43 @@ export function AddTransactionModal({ isOpen, onClose, initialSymbol = "" }: Add
       pricePerCoin: 0,
     }
   });
+
+  const symbolValue = watch("symbol");
+  const debouncedQuery = useDebounce(symbolValue, 500);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function performSearch() {
+      if (!debouncedQuery) {
+        setSearchResults([]);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const results = await searchCoins(debouncedQuery);
+        setSearchResults(results.slice(0, 5));
+        setShowResults(true);
+      } catch (error) {
+        console.error("Search failed", error);
+      } finally {
+        setIsSearching(false);
+      }
+    }
+    performSearch();
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (initialSymbol) {
@@ -77,14 +117,49 @@ export function AddTransactionModal({ isOpen, onClose, initialSymbol = "" }: Add
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           {error && <div className="text-sm text-red-500 bg-red-500/10 p-2 rounded break-words max-h-32 overflow-y-auto">{error}</div>}
           
-          <div className="space-y-2">
+          <div className="space-y-2 relative" ref={searchRef}>
             <label className="text-sm font-medium text-gray-300">Coin Symbol</label>
-            <Input 
-              {...register("symbol")}
-              placeholder="e.g. BTC, ETH" 
-              className="bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
-            />
+            <div className="relative">
+              <Input 
+                {...register("symbol")}
+                onChange={(e) => {
+                  register("symbol").onChange(e);
+                  setShowResults(true);
+                }}
+                onFocus={() => {
+                  if (symbolValue?.length > 0) setShowResults(true);
+                }}
+                placeholder="e.g. BTC, ETH" 
+                className="bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
+              />
+              {isSearching && (
+                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7C3AED] animate-spin" />
+              )}
+            </div>
             {errors.symbol && <p className="text-sm text-red-500">{errors.symbol.message}</p>}
+
+            {showResults && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#18181B] border border-white/10 rounded-lg shadow-2xl overflow-hidden z-50">
+                <div className="py-2">
+                  {searchResults.map((coin) => (
+                    <div 
+                      key={coin.id} 
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-white/5 transition-colors cursor-pointer"
+                      onClick={() => {
+                        setValue("symbol", coin.symbol.toUpperCase());
+                        setShowResults(false);
+                      }}
+                    >
+                      <img src={coin.thumb} alt={coin.name} className="w-5 h-5 rounded-full" />
+                      <div>
+                        <p className="text-sm font-medium text-white">{coin.name}</p>
+                        <p className="text-xs text-gray-500 uppercase">{coin.symbol}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="grid grid-cols-2 gap-4">

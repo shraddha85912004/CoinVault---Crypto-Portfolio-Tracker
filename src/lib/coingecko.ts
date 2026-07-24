@@ -13,6 +13,29 @@ export interface CoinMarketData {
   };
 }
 
+export const SYMBOL_TO_ID: Record<string, string> = {
+  btc: "bitcoin",
+  eth: "ethereum",
+  sol: "solana",
+  bnb: "binancecoin",
+  xrp: "ripple",
+  ada: "cardano",
+  doge: "dogecoin",
+  usdt: "tether",
+  usdc: "usd-coin",
+  dot: "polkadot",
+  matic: "matic-network",
+  shib: "shiba-inu",
+  ltc: "litecoin",
+  link: "chainlink",
+  etc: "ethereum-classic",
+};
+
+export function normalizeCoinId(idOrSymbol: string) {
+  const lowered = idOrSymbol.toLowerCase();
+  return SYMBOL_TO_ID[lowered] || lowered;
+}
+
 const COINGECKO_API = "https://api.coingecko.com/api/v3";
 
 export async function getTopCoins(limit: number = 10): Promise<CoinMarketData[]> {

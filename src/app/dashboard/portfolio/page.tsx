@@ -1,9 +1,9 @@
 import { PortfolioList } from "@/components/dashboard/portfolio-list";
-import { getPortfolio } from "@/app/actions/portfolio";
+import { getPortfolioWithLiveMetrics } from "@/app/actions/portfolio";
 import { Suspense } from "react";
 
 export default async function PortfolioPage() {
-  const transactions = await getPortfolio();
+  const transactions = await getPortfolioWithLiveMetrics();
   
   return (
     <div className="space-y-6">

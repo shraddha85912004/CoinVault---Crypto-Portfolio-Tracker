@@ -5,9 +5,9 @@ import { login } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, name } = await req.json();
 
-    if (!email || !password || password.length < 6) {
+    if (!email || !password || password.length < 6 || !name) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.create({
       data: {
         email,
+        name,
         password: hashedPassword,
       },
     });

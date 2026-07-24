@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
 
 const registerSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string()
@@ -39,7 +40,7 @@ export default function RegisterPage() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, password: data.password }),
+        body: JSON.stringify({ email: data.email, password: data.password, name: data.name }),
       });
 
       if (!response.ok) {
@@ -79,10 +80,22 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
+
+            <div className="space-y-2">
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <Input 
+                  {...register("name")}
+                  placeholder="Display Name" 
+                  className="pl-10 bg-[#09090B] border-white/10 text-white focus-visible:ring-[#7C3AED]"
+                />
+              </div>
+              {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            </div>
             
             <div className="space-y-2">
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <Input 
                   {...register("email")}
                   placeholder="name@example.com" 
@@ -94,7 +107,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <Input 
                   {...register("password")}
                   type="password" 
@@ -107,7 +120,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <Input 
                   {...register("confirmPassword")}
                   type="password" 

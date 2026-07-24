@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getLivePrices, normalizeCoinId, searchCoins } from "@/lib/coingecko";
 
 export async function addTransaction(data: {
   coinId: string;
@@ -20,16 +21,54 @@ export async function addTransaction(data: {
   const userId = session.userId as string;
 
   try {
-    const portfolio = await prisma.portfolio.create({
-      data: {
-        userId,
-        coinId: data.coinId,
-        symbol: data.symbol,
-        name: data.name,
-        amount: data.amount,
-        buyPrice: data.pricePerCoin,
+    let actualCoinId = normalizeCoinId(data.coinId);
+    
+    // If it's still just the raw lowercase symbol (meaning it wasn't in our dictionary), 
+    // let's try to find its true CoinGecko ID via the search API to prevent broken tracking.
+    if (actualCoinId === data.coinId.toLowerCase()) {
+      const searchResults = await searchCoins(data.symbol);
+      const match = searchResults.find((c: any) => c.symbol.toLowerCase() === data.symbol.toLowerCase());
+      if (match) {
+        actualCoinId = match.id;
+      }
+    }
+
+    const existingEntry = await prisma.portfolio.findUnique({
+      where: {
+        userId_coinId: {
+          userId,
+          coinId: actualCoinId,
+        },
       },
     });
+
+    let portfolio;
+
+    if (existingEntry) {
+      const totalOldValue = existingEntry.amount * existingEntry.buyPrice;
+      const totalNewValue = data.amount * data.pricePerCoin;
+      const newTotalAmount = existingEntry.amount + data.amount;
+      const newAveragePrice = (totalOldValue + totalNewValue) / newTotalAmount;
+
+      portfolio = await prisma.portfolio.update({
+        where: { id: existingEntry.id },
+        data: {
+          amount: newTotalAmount,
+          buyPrice: newAveragePrice,
+        },
+      });
+    } else {
+      portfolio = await prisma.portfolio.create({
+        data: {
+          userId,
+          coinId: data.coinId,
+          symbol: data.symbol,
+          name: data.name,
+          amount: data.amount,
+          buyPrice: data.pricePerCoin,
+        },
+      });
+    }
 
     revalidatePath("/dashboard");
     return { success: true, portfolio };
@@ -90,7 +129,6 @@ export async function deleteTransaction(id: string) {
   }
 }
 
-import { getLivePrices } from "@/lib/coingecko";
 
 export type PortfolioWithMetrics = {
   id: string;
@@ -111,11 +149,12 @@ export async function getPortfolioWithLiveMetrics(): Promise<PortfolioWithMetric
   const transactions = await getPortfolio();
   if (transactions.length === 0) return [];
 
-  const coinIds = transactions.map(t => t.coinId);
+  const coinIds = transactions.map(t => normalizeCoinId(t.coinId));
   const livePrices = await getLivePrices(coinIds);
 
   return transactions.map(tx => {
-    const liveData = livePrices[tx.coinId] || { usd: tx.buyPrice, usd_24h_change: 0 };
+    const normalizedId = normalizeCoinId(tx.coinId);
+    const liveData = livePrices[normalizedId] || { usd: tx.buyPrice, usd_24h_change: 0 };
     const currentPrice = liveData.usd;
     const change24h = liveData.usd_24h_change || 0;
     

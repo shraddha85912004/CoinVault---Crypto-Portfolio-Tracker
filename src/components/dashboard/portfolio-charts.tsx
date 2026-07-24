@@ -57,6 +57,7 @@ export function PortfolioCharts({ data }: PortfolioChartsProps) {
                 innerRadius={60}
                 outerRadius={100}
                 paddingAngle={5}
+                minAngle={15}
                 dataKey="value"
                 stroke="none"
               >
@@ -103,7 +104,7 @@ export function PortfolioCharts({ data }: PortfolioChartsProps) {
                 tickFormatter={(value) => `$${value}`}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: '#ffffff0a' }} />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="value" radius={[4, 4, 0, 0]} minPointSize={5}>
                 {barData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}

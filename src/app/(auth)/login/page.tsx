@@ -78,7 +78,7 @@ export default function LoginPage() {
             
             <div className="space-y-2">
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <Input 
                   {...register("email")}
                   placeholder="name@example.com" 
@@ -90,7 +90,7 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <Input 
                   {...register("password")}
                   type="password" 

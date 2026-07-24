@@ -64,7 +64,7 @@ export function SettingsForm({ initialData }: { initialData: { email: string; na
           <Input 
             value={initialData.email}
             disabled
-            className="bg-[#09090B] border-white/10 text-gray-500 cursor-not-allowed opacity-50"
+            className="bg-[#09090B] border-white/10 text-gray-300 cursor-not-allowed"
           />
           <p className="text-xs text-gray-500">Email cannot be changed once registered.</p>
         </div>
